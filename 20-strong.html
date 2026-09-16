@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bandeja 20 Strong</title>
 <style>
   :root{
@@ -38,6 +43,7 @@
   }
 
   *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
   body{
     background:var(--bg);
     color:var(--text);
@@ -46,6 +52,7 @@
     padding-block:28px;
     line-height:1.5;
   }
+  img{ max-width:100%; }
   button{ font-family:inherit; }
   button:focus-visible, .die:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 
@@ -194,8 +201,9 @@
     .foot .btn{ width:100%; }
   }
 </style>
-
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+</head>
+<body>
 
 <div class="app">
   <div class="topbar">
@@ -578,7 +586,6 @@
     renderButtons();
   }
 
-  // --- drag handling (pointer events, works for mouse and touch) ---
   var drag = null;
 
   function onDieDown(e, id){
@@ -663,18 +670,9 @@
   document.getElementById('btn-recuperar').addEventListener('click', recuperar);
   document.getElementById('btn-reset').addEventListener('click', reiniciar);
 
-  function start(hotData){
-    state = (hotData && Array.isArray(hotData.dice) && hotData.stats) ? hotData : (loadFromStorage() || defaultState());
-    render();
-    if(window.claude && window.claude.hot && window.claude.hot.snapshot){
-      window.claude.hot.snapshot(function(){ return state; });
-    }
-  }
-
-  if(window.claude && window.claude.hot && window.claude.hot.ready){
-    window.claude.hot.ready(start);
-  }else{
-    start(window.claude && window.claude.hot ? window.claude.hot.data : null);
-  }
+  state = loadFromStorage() || defaultState();
+  render();
 })();
 </script>
+</body>
+</html>
