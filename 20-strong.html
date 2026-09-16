@@ -1,0 +1,663 @@
+<title>Bandeja 20 Strong</title>
+<style>
+  :root{
+    --bg:#16131c;
+    --surface:#201b29;
+    --surface-2:#2a2334;
+    --border:#3a3148;
+    --text:#efe9f7;
+    --muted:#a89ac0;
+    --muted-2:#7c6d95;
+    --c-yellow:#e8c34c;
+    --c-green:#6fae5c;
+    --c-blue:#5091d6;
+    --c-purple:#a173dd;
+    --c-red:#d75a52;
+    --accent:#a173dd;
+    --danger:#d75a52;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#faf7f2;
+      --surface:#ffffff;
+      --surface-2:#f2ecfa;
+      --border:#e1d7ee;
+      --text:#241d30;
+      --muted:#6a5c83;
+      --muted-2:#8b7ba6;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#faf7f2;
+    --surface:#ffffff;
+    --surface-2:#f2ecfa;
+    --border:#e1d7ee;
+    --text:#241d30;
+    --muted:#6a5c83;
+    --muted-2:#8b7ba6;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    padding-inline:16px;
+    padding-block:28px;
+    line-height:1.5;
+  }
+  button{ font-family:inherit; }
+  button:focus-visible, .die:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .app{ max-width:1020px; margin:0 auto; }
+
+  h1,h2{ font-family:'Bricolage Grotesque','IBM Plex Sans',sans-serif; text-wrap:balance; letter-spacing:-0.01em; margin:0; }
+  .mono{ font-family:'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted-2); margin:0 0 4px;
+  }
+  h1{ font-size:clamp(22px,4vw,30px); font-weight:700; }
+
+  .topbar{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    gap:18px; margin-bottom:18px;
+  }
+
+  .stats{ display:flex; gap:10px; flex-wrap:wrap; }
+  .stat-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:9px 12px; display:flex; flex-direction:column; gap:7px; min-width:172px;
+  }
+  .stat-card[data-empty="1"]{ border-color:var(--danger); }
+  .stat-head{ display:flex; align-items:center; gap:7px; }
+  .stat-icon{ font-size:15px; color:var(--muted-2); flex:none; }
+  .stat-label{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+  .stat-card[data-empty="1"] .stat-label{ color:var(--danger); }
+  .stat-die-row{ display:flex; gap:4px; flex-wrap:wrap; }
+  .die-opt{
+    width:29px; height:29px; padding:4px; border-radius:8px;
+    border:1.5px solid var(--border); background:var(--surface-2);
+    color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .die-opt:hover{ border-color:var(--accent); }
+  .die-opt.active{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 30%, var(--surface)); }
+  .pipface{ display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); width:100%; height:100%; }
+  .pipface .cell{ display:flex; align-items:center; justify-content:center; }
+  .pip-dot{ width:3.5px; height:3.5px; border-radius:50%; background:currentColor; flex:none; }
+  .pipface.zero{ align-items:center; justify-content:center; }
+  .zero-mark{ font-size:14px; font-weight:700; color:var(--danger); line-height:1; }
+
+  .banner{
+    background:color-mix(in srgb, var(--danger) 18%, var(--surface));
+    border:1px solid var(--danger); color:var(--danger);
+    border-radius:10px; padding:9px 14px; font-size:13.5px; font-weight:600;
+    margin-bottom:16px;
+  }
+
+  .legend-bar{
+    display:flex; gap:16px; flex-wrap:wrap;
+    font-size:12.5px; color:var(--muted);
+    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    padding-block:10px; margin-bottom:20px;
+  }
+  .legend-bar span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend-chip{
+    width:20px; height:20px; border-radius:6px; display:flex; align-items:center;
+    justify-content:center; font-size:11px; font-weight:700; border:1px solid var(--border);
+  }
+  .legend-chip.miss{ background:var(--surface-2); color:var(--muted-2); }
+  .legend-chip.hit{ background:color-mix(in srgb, var(--accent) 28%, var(--surface)); color:var(--text); }
+  .legend-chip.crit{ background:var(--accent); color:#171220; }
+
+  .board{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+    gap:14px;
+    margin-bottom:20px;
+  }
+  .zone{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:14px 14px 16px; display:flex; flex-direction:column; min-height:220px;
+  }
+  .zone-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px; }
+  .zone-head h2{ font-size:15.5px; }
+  .zone-count{ font-size:12px; color:var(--muted-2); }
+
+  .zone-body{
+    flex:1;
+    border:1.5px dashed var(--border);
+    border-radius:12px;
+    padding:10px;
+    display:flex; flex-direction:column; gap:10px;
+    transition:border-color .15s, background .15s;
+  }
+  .zone-body.drop-hover{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .zone-body.flat{ flex-direction:row; flex-wrap:wrap; align-content:flex-start; gap:8px; }
+  .zone-body.empty::after{ content:attr(data-empty-label); color:var(--muted-2); font-size:12.5px; margin:auto; }
+
+  .color-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-height:42px; }
+  .color-row .swatch{ width:8px; height:8px; border-radius:50%; flex:none; }
+
+  .die{
+    --dc: var(--c-yellow);
+    width:42px; height:42px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--dc) 16%, var(--surface));
+    border:1.5px solid color-mix(in srgb, var(--dc) 55%, var(--border));
+    cursor:grab; touch-action:none; position:relative; flex:none;
+    user-select:none;
+  }
+  .die svg{ width:80%; height:80%; overflow:visible; }
+  .die.dragging{ cursor:grabbing; box-shadow:0 8px 20px rgba(0,0,0,.35); z-index:1000; }
+  .die.miss{ background:var(--surface-2); border-color:var(--border); }
+  .die.hit{ background:color-mix(in srgb, var(--dc) 30%, var(--surface)); border-color:var(--dc); }
+  .die.crit{ background:var(--dc); border-color:var(--dc); }
+
+  .tally{
+    display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; color:var(--muted);
+    margin-top:12px; font-family:'IBM Plex Mono', monospace;
+  }
+  .tally b{ color:var(--text); font-weight:600; }
+
+  .zone-actions{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .btn{
+    font-size:13px; font-weight:600; border-radius:9px; padding:9px 14px;
+    border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+    cursor:pointer;
+  }
+  .btn:hover:not(:disabled){ border-color:var(--accent); }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#171220; }
+  .btn.primary:hover:not(:disabled){ filter:brightness(1.08); }
+
+  .foot{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding-top:14px; border-top:1px solid var(--border); }
+  .btn.ghost{ background:transparent; }
+  .hint{ font-size:12.5px; color:var(--muted-2); margin:0; }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<div class="app">
+  <div class="topbar">
+    <div>
+      <p class="eyebrow">Substituto virtual · componentes de 20 Strong</p>
+      <h1>Bandeja de Dados</h1>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div id="banner-slot"></div>
+
+  <div class="legend-bar">
+    <span><span class="legend-chip miss"></span> vazio · errou</span>
+    <span><span class="legend-chip hit">✧</span> estrela vazada · 1 dano</span>
+    <span><span class="legend-chip crit">✦</span> estrela cheia · crítico · 2 dano</span>
+    <span>Pips na borda = lados de sucesso daquela cor — fixo, independe da rolagem</span>
+  </div>
+
+  <main class="board">
+    <section class="zone" data-zone="reserva">
+      <div class="zone-head"><h2>Reserva</h2><span class="zone-count mono" id="count-reserva"></span></div>
+      <div class="zone-body" id="body-reserva" data-zone="reserva" data-empty-label="Nenhum dado na reserva"></div>
+    </section>
+
+    <section class="zone" data-zone="comprometidos">
+      <div class="zone-head"><h2>Comprometidos</h2><span class="zone-count mono" id="count-comprometidos"></span></div>
+      <div class="zone-body flat" id="body-comprometidos" data-zone="comprometidos" data-empty-label="Arraste dados da Reserva para engajar"></div>
+      <div class="tally" id="tally"></div>
+      <div class="zone-actions">
+        <button class="btn primary" id="btn-rolar">Rolar todos</button>
+        <button class="btn" id="btn-encerrar">Encerrar engajamento</button>
+      </div>
+    </section>
+
+    <section class="zone" data-zone="esgotados">
+      <div class="zone-head"><h2>Esgotados</h2><span class="zone-count mono" id="count-esgotados"></span></div>
+      <div class="zone-body flat" id="body-esgotados" data-zone="esgotados" data-empty-label="Nenhum dado esgotado"></div>
+      <div class="zone-actions">
+        <button class="btn" id="btn-recuperar"></button>
+      </div>
+    </section>
+  </main>
+
+  <div class="foot">
+    <button class="btn ghost" id="btn-reset">Reiniciar bandeja</button>
+    <p class="hint">Arraste um dado entre as áreas para movê-lo. Toque num dado parado em Comprometidos para rolar só ele, ou use "Rolar todos".</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var COLORS = {
+    yellow:{ label:'Amarelo', count:4, faces:{miss:4,hit:1,crit:1}, pips:2, cssVar:'--c-yellow' },
+    green: { label:'Verde',   count:4, faces:{miss:3,hit:2,crit:1}, pips:3, cssVar:'--c-green'  },
+    blue:  { label:'Azul',    count:4, faces:{miss:2,hit:3,crit:1}, pips:4, cssVar:'--c-blue'   },
+    purple:{ label:'Roxo',    count:4, faces:{miss:1,hit:4,crit:1}, pips:5, cssVar:'--c-purple' },
+    red:   { label:'Vermelho',count:1, faces:{miss:0,hit:5,crit:1}, pips:6, cssVar:'--c-red'    }
+  };
+  var COLOR_ORDER = ['yellow','green','blue','purple','red'];
+  var STORAGE_KEY = 'strongtray-state-v1';
+
+  var STAT_DEFS = [
+    { key:'vida', label:'Vida', icon:'♥', min:0, max:6 },
+    { key:'estrategia', label:'Estratégia', icon:'▭', min:1, max:6 },
+    { key:'recuperacao', label:'Recuperação', icon:'➤', min:1, max:6 }
+  ];
+
+  function defaultState(){
+    var dice = [];
+    COLOR_ORDER.forEach(function(color){
+      for(var i=0;i<COLORS[color].count;i++){
+        dice.push({ id:color+'-'+i, color:color, zone:'reserva', rolled:null });
+      }
+    });
+    return { dice:dice, stats:{ vida:3, estrategia:2, recuperacao:2 } };
+  }
+
+  function loadFromStorage(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      var parsed = JSON.parse(raw);
+      if(parsed && Array.isArray(parsed.dice) && parsed.stats) return parsed;
+    }catch(e){}
+    return null;
+  }
+
+  function saveToStorage(state){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  var state;
+
+  function rollDie(color){
+    var f = COLORS[color].faces;
+    var r = Math.random()*6;
+    if(r < f.miss) return 'miss';
+    if(r < f.miss+f.hit) return 'hit';
+    return 'crit';
+  }
+
+  function clampStat(key, val){
+    var def = STAT_DEFS.filter(function(d){ return d.key===key; })[0];
+    return Math.max(def.min, Math.min(def.max, val));
+  }
+
+  function diceInZone(zone){ return state.dice.filter(function(d){ return d.zone===zone; }); }
+
+  function moveDie(id, targetZone){
+    var die = state.dice.filter(function(d){ return d.id===id; })[0];
+    if(!die || die.zone===targetZone) return;
+    die.zone = targetZone;
+    die.rolled = null;
+    save();
+    render();
+  }
+
+  function tryRollDie(id){
+    var die = state.dice.filter(function(d){ return d.id===id; })[0];
+    if(!die || die.zone!=='comprometidos' || die.rolled!==null) return;
+    die.rolled = rollDie(die.color);
+    save();
+    render();
+  }
+
+  function rolarTodos(){
+    var changed = false;
+    diceInZone('comprometidos').forEach(function(die){
+      if(die.rolled===null){ die.rolled = rollDie(die.color); changed = true; }
+    });
+    if(changed){ save(); render(); }
+  }
+
+  function encerrarEngajamento(){
+    var comprometidos = diceInZone('comprometidos');
+    if(comprometidos.length===0) return;
+    comprometidos.forEach(function(die){ die.zone='esgotados'; die.rolled=null; });
+    save();
+    render();
+  }
+
+  function recuperar(){
+    var n = state.stats.recuperacao;
+    var esgotados = diceInZone('esgotados');
+    esgotados.slice(0, n).forEach(function(die){ die.zone='reserva'; die.rolled=null; });
+    save();
+    render();
+  }
+
+  function reiniciar(){
+    state = defaultState();
+    save();
+    render();
+  }
+
+  function setStat(key, val){
+    state.stats[key] = clampStat(key, val);
+    save();
+    render();
+  }
+
+  function pipPattern(n){
+    switch(n){
+      case 1: return [4];
+      case 2: return [0,8];
+      case 3: return [0,4,8];
+      case 4: return [0,2,6,8];
+      case 5: return [0,2,4,6,8];
+      case 6: return [0,2,3,5,6,8];
+      default: return [];
+    }
+  }
+
+  function buildFace(n){
+    var face = document.createElement('div');
+    face.className = 'pipface';
+    if(n===0){
+      face.classList.add('zero');
+      var mark = document.createElement('span');
+      mark.className = 'zero-mark';
+      mark.textContent = '×';
+      face.appendChild(mark);
+      return face;
+    }
+    var active = pipPattern(n);
+    for(var i=0;i<9;i++){
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      if(active.indexOf(i)!==-1){
+        var dot = document.createElement('div');
+        dot.className = 'pip-dot';
+        cell.appendChild(dot);
+      }
+      face.appendChild(cell);
+    }
+    return face;
+  }
+
+  function save(){ saveToStorage(state); }
+
+  function dieLabel(die){
+    var c = COLORS[die.color];
+    if(die.rolled==='miss') return c.label+' — errou';
+    if(die.rolled==='hit') return c.label+' — acerto (1 dano)';
+    if(die.rolled==='crit') return c.label+' — crítico (2 dano)';
+    return c.label+' — pronto ('+c.pips+'/6 lados de sucesso)';
+  }
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  function buildBadge(die){
+    var c = COLORS[die.color];
+    var rolled = die.rolled;
+    var ringColor = rolled==='crit' ? 'rgba(23,18,32,.55)' : 'var('+c.cssVar+')';
+
+    var svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 40 40');
+
+    var ring = document.createElementNS(SVG_NS, 'circle');
+    ring.setAttribute('cx','20'); ring.setAttribute('cy','20'); ring.setAttribute('r','15');
+    ring.setAttribute('fill','none');
+    ring.setAttribute('stroke', ringColor);
+    ring.setAttribute('stroke-width','2');
+    if(rolled===null) ring.setAttribute('stroke-dasharray','2.5,2.5');
+    svg.appendChild(ring);
+
+    for(var i=0;i<c.pips;i++){
+      var angle = (-90 + i*(360/c.pips)) * Math.PI/180;
+      var pip = document.createElementNS(SVG_NS, 'circle');
+      pip.setAttribute('cx', (20+15*Math.cos(angle)).toFixed(2));
+      pip.setAttribute('cy', (20+15*Math.sin(angle)).toFixed(2));
+      pip.setAttribute('r','1.8');
+      pip.setAttribute('fill', ringColor);
+      svg.appendChild(pip);
+    }
+
+    if(rolled==='hit' || rolled==='crit'){
+      var text = document.createElementNS(SVG_NS, 'text');
+      text.setAttribute('x','20'); text.setAttribute('y','20');
+      text.setAttribute('text-anchor','middle');
+      text.setAttribute('dominant-baseline','central');
+      text.setAttribute('font-size', rolled==='crit' ? '17' : '15');
+      text.setAttribute('fill', rolled==='crit' ? '#171220' : 'var(--text)');
+      text.textContent = rolled==='crit' ? '✦' : '✧';
+      svg.appendChild(text);
+    }
+
+    return svg;
+  }
+
+  function renderDie(die){
+    var c = COLORS[die.color];
+    var el = document.createElement('div');
+    el.className = 'die'+(die.rolled?(' '+die.rolled):'');
+    el.style.setProperty('--dc', 'var('+c.cssVar+')');
+    el.dataset.id = die.id;
+    el.tabIndex = 0;
+    el.title = dieLabel(die);
+    el.setAttribute('aria-label', dieLabel(die));
+    el.appendChild(buildBadge(die));
+    el.addEventListener('pointerdown', function(e){ onDieDown(e, die.id); });
+    return el;
+  }
+
+  function renderReservaRows(container){
+    container.innerHTML = '';
+    var anyDice = false;
+    COLOR_ORDER.forEach(function(color){
+      var diceOfColor = state.dice.filter(function(d){ return d.color===color && d.zone==='reserva'; });
+      var row = document.createElement('div');
+      row.className = 'color-row';
+      var swatch = document.createElement('span');
+      swatch.className = 'swatch';
+      swatch.style.background = 'var('+COLORS[color].cssVar+')';
+      row.appendChild(swatch);
+      diceOfColor.forEach(function(die){ row.appendChild(renderDie(die)); anyDice = true; });
+      container.appendChild(row);
+    });
+    container.classList.toggle('empty', !anyDice);
+  }
+
+  function renderFlatZone(container, zone, emptyLabel){
+    container.innerHTML = '';
+    var dice = diceInZone(zone);
+    dice.forEach(function(die){ container.appendChild(renderDie(die)); });
+    container.classList.toggle('empty', dice.length===0);
+    container.dataset.emptyLabel = emptyLabel;
+  }
+
+  function renderStats(){
+    var wrap = document.getElementById('stats');
+    wrap.innerHTML = '';
+    STAT_DEFS.forEach(function(def){
+      var val = state.stats[def.key];
+      var card = document.createElement('div');
+      card.className = 'stat-card';
+      if(def.key==='vida' && val<=0) card.dataset.empty = '1';
+
+      var head = document.createElement('div');
+      head.className = 'stat-head';
+      var icon = document.createElement('span');
+      icon.className = 'stat-icon';
+      icon.textContent = def.icon;
+      head.appendChild(icon);
+      var label = document.createElement('span');
+      label.className = 'stat-label';
+      label.textContent = def.label;
+      head.appendChild(label);
+      card.appendChild(head);
+
+      var row = document.createElement('div');
+      row.className = 'stat-die-row';
+      for(var n=def.min; n<=def.max; n++){
+        (function(n){
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'die-opt'+(n===val?' active':'');
+          btn.setAttribute('aria-label', def.label+' = '+n);
+          btn.title = def.label+' = '+n;
+          btn.appendChild(buildFace(n));
+          btn.addEventListener('click', function(){ setStat(def.key, n); });
+          row.appendChild(btn);
+        })(n);
+      }
+      card.appendChild(row);
+      wrap.appendChild(card);
+    });
+  }
+
+  function renderBanner(){
+    var slot = document.getElementById('banner-slot');
+    slot.innerHTML = '';
+    if(state.stats.vida<=0){
+      var b = document.createElement('div');
+      b.className = 'banner';
+      b.textContent = 'Vida chegou a 0 — herói derrotado. Ajuste a Vida ou reinicie a bandeja.';
+      slot.appendChild(b);
+    }
+  }
+
+  function renderTally(){
+    var comprometidos = diceInZone('comprometidos');
+    var hits = comprometidos.filter(function(d){ return d.rolled==='hit'; }).length;
+    var crits = comprometidos.filter(function(d){ return d.rolled==='crit'; }).length;
+    var misses = comprometidos.filter(function(d){ return d.rolled==='miss'; }).length;
+    var dano = hits*1 + crits*2;
+    var el = document.getElementById('tally');
+    el.innerHTML =
+      '<span>acertos <b>'+hits+'</b></span>' +
+      '<span>críticos <b>'+crits+'</b></span>' +
+      '<span>erros <b>'+misses+'</b></span>' +
+      '<span>dano total <b>'+dano+'</b></span>';
+  }
+
+  function renderCounts(){
+    document.getElementById('count-reserva').textContent = diceInZone('reserva').length+' dados';
+    document.getElementById('count-comprometidos').textContent = diceInZone('comprometidos').length+' dados';
+    document.getElementById('count-esgotados').textContent = diceInZone('esgotados').length+' dados';
+  }
+
+  function renderButtons(){
+    var comprometidos = diceInZone('comprometidos');
+    var esgotados = diceInZone('esgotados');
+    document.getElementById('btn-rolar').disabled = comprometidos.filter(function(d){ return d.rolled===null; }).length===0;
+    document.getElementById('btn-encerrar').disabled = comprometidos.length===0;
+    var recBtn = document.getElementById('btn-recuperar');
+    recBtn.textContent = 'Recuperar ('+state.stats.recuperacao+')';
+    recBtn.disabled = esgotados.length===0;
+  }
+
+  function render(){
+    renderStats();
+    renderBanner();
+    renderReservaRows(document.getElementById('body-reserva'));
+    renderFlatZone(document.getElementById('body-comprometidos'), 'comprometidos', 'Arraste dados da Reserva para engajar');
+    renderFlatZone(document.getElementById('body-esgotados'), 'esgotados', 'Nenhum dado esgotado');
+    renderTally();
+    renderCounts();
+    renderButtons();
+  }
+
+  // --- drag handling (pointer events, works for mouse and touch) ---
+  var drag = null;
+
+  function onDieDown(e, id){
+    var el = e.currentTarget;
+    var rect = el.getBoundingClientRect();
+    drag = {
+      id:id, el:el, moved:false,
+      startX:e.clientX, startY:e.clientY,
+      offsetX:e.clientX-rect.left, offsetY:e.clientY-rect.top,
+      w:rect.width, h:rect.height
+    };
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+    el.classList.add('dragging');
+    el.style.position = 'fixed';
+    el.style.left = rect.left+'px';
+    el.style.top = rect.top+'px';
+    el.style.width = rect.width+'px';
+    el.style.height = rect.height+'px';
+    el.style.pointerEvents = 'none';
+    clearZoneHover();
+  }
+
+  function clearZoneHover(){
+    document.querySelectorAll('.zone-body.drop-hover').forEach(function(z){ z.classList.remove('drop-hover'); });
+  }
+
+  document.addEventListener('pointermove', function(e){
+    if(!drag) return;
+    var dx = e.clientX-drag.startX, dy = e.clientY-drag.startY;
+    if(Math.hypot(dx,dy) > 6) drag.moved = true;
+    if(drag.moved){
+      e.preventDefault();
+      drag.el.style.left = (e.clientX-drag.offsetX)+'px';
+      drag.el.style.top = (e.clientY-drag.offsetY)+'px';
+      clearZoneHover();
+      var under = document.elementFromPoint(e.clientX, e.clientY);
+      var zoneEl = under && under.closest ? under.closest('.zone-body') : null;
+      if(zoneEl) zoneEl.classList.add('drop-hover');
+    }
+  }, { passive:false });
+
+  document.addEventListener('pointerup', function(e){
+    if(!drag) return;
+    var id = drag.id, el = drag.el, moved = drag.moved;
+    el.classList.remove('dragging');
+    el.style.position = '';
+    el.style.left = '';
+    el.style.top = '';
+    el.style.width = '';
+    el.style.height = '';
+    el.style.pointerEvents = '';
+    clearZoneHover();
+
+    if(moved){
+      var under = document.elementFromPoint(e.clientX, e.clientY);
+      var zoneEl = under && under.closest ? under.closest('[data-zone]') : null;
+      if(zoneEl) moveDie(id, zoneEl.dataset.zone);
+      else render();
+    }else{
+      tryRollDie(id);
+    }
+    drag = null;
+  });
+
+  document.addEventListener('pointercancel', function(){
+    if(!drag) return;
+    var el = drag.el;
+    el.classList.remove('dragging');
+    el.style.position = '';
+    el.style.left = '';
+    el.style.top = '';
+    el.style.width = '';
+    el.style.height = '';
+    el.style.pointerEvents = '';
+    clearZoneHover();
+    drag = null;
+    render();
+  });
+
+  document.getElementById('btn-rolar').addEventListener('click', rolarTodos);
+  document.getElementById('btn-encerrar').addEventListener('click', encerrarEngajamento);
+  document.getElementById('btn-recuperar').addEventListener('click', recuperar);
+  document.getElementById('btn-reset').addEventListener('click', reiniciar);
+
+  function start(hotData){
+    state = (hotData && Array.isArray(hotData.dice) && hotData.stats) ? hotData : (loadFromStorage() || defaultState());
+    render();
+    if(window.claude && window.claude.hot && window.claude.hot.snapshot){
+      window.claude.hot.snapshot(function(){ return state; });
+    }
+  }
+
+  if(window.claude && window.claude.hot && window.claude.hot.ready){
+    window.claude.hot.ready(start);
+  }else{
+    start(window.claude && window.claude.hot ? window.claude.hot.data : null);
+  }
+})();
+</script>
