@@ -19,7 +19,6 @@
     --c-purple:#a173dd;
     --c-red:#d75a52;
     --accent:#a173dd;
-    --danger:#d75a52;
   }
   @media (prefers-color-scheme: light){
     :root:not([data-theme="dark"]){
@@ -78,11 +77,9 @@
     background:var(--surface); border:1px solid var(--border); border-radius:12px;
     padding:9px 12px; display:flex; flex-direction:column; gap:7px; min-width:172px;
   }
-  .stat-card[data-empty="1"]{ border-color:var(--danger); }
   .stat-head{ display:flex; align-items:center; gap:7px; }
   .stat-icon{ font-size:15px; color:var(--muted-2); flex:none; }
   .stat-label{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
-  .stat-card[data-empty="1"] .stat-label{ color:var(--danger); }
   .stat-die-row{ display:flex; gap:4px; flex-wrap:wrap; }
   .die-opt{
     width:29px; height:29px; padding:4px; border-radius:8px;
@@ -94,15 +91,6 @@
   .pipface{ display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); width:100%; height:100%; }
   .pipface .cell{ display:flex; align-items:center; justify-content:center; }
   .pip-dot{ width:3.5px; height:3.5px; border-radius:50%; background:currentColor; flex:none; }
-  .pipface.zero{ align-items:center; justify-content:center; }
-  .zero-mark{ font-size:14px; font-weight:700; color:var(--danger); line-height:1; }
-
-  .banner{
-    background:color-mix(in srgb, var(--danger) 18%, var(--surface));
-    border:1px solid var(--danger); color:var(--danger);
-    border-radius:10px; padding:9px 14px; font-size:13.5px; font-weight:600;
-    margin-bottom:16px;
-  }
 
   .legend-bar{
     display:flex; gap:16px; flex-wrap:wrap;
@@ -214,8 +202,6 @@
     <div class="stats" id="stats"></div>
   </div>
 
-  <div id="banner-slot"></div>
-
   <div class="legend-bar">
     <span><span class="legend-chip miss"></span> vazio · errou</span>
     <span><span class="legend-chip hit">✧</span> estrela vazada · 1 dano</span>
@@ -267,7 +253,7 @@
   var STORAGE_KEY = 'strongtray-state-v1';
 
   var STAT_DEFS = [
-    { key:'vida', label:'Vida', icon:'♥', min:0, max:6 },
+    { key:'vida', label:'Vida', icon:'♥', min:1, max:6 },
     { key:'estrategia', label:'Estratégia', icon:'▭', min:1, max:6 },
     { key:'recuperacao', label:'Recuperação', icon:'➤', min:1, max:6 }
   ];
@@ -381,14 +367,6 @@
   function buildFace(n){
     var face = document.createElement('div');
     face.className = 'pipface';
-    if(n===0){
-      face.classList.add('zero');
-      var mark = document.createElement('span');
-      mark.className = 'zero-mark';
-      mark.textContent = '×';
-      face.appendChild(mark);
-      return face;
-    }
     var active = pipPattern(n);
     for(var i=0;i<9;i++){
       var cell = document.createElement('div');
@@ -501,7 +479,6 @@
       var val = state.stats[def.key];
       var card = document.createElement('div');
       card.className = 'stat-card';
-      if(def.key==='vida' && val<=0) card.dataset.empty = '1';
 
       var head = document.createElement('div');
       head.className = 'stat-head';
@@ -532,17 +509,6 @@
       card.appendChild(row);
       wrap.appendChild(card);
     });
-  }
-
-  function renderBanner(){
-    var slot = document.getElementById('banner-slot');
-    slot.innerHTML = '';
-    if(state.stats.vida<=0){
-      var b = document.createElement('div');
-      b.className = 'banner';
-      b.textContent = 'Vida chegou a 0 — herói derrotado. Ajuste a Vida ou reinicie a bandeja.';
-      slot.appendChild(b);
-    }
   }
 
   function renderTally(){
@@ -577,7 +543,6 @@
 
   function render(){
     renderStats();
-    renderBanner();
     renderReservaRows(document.getElementById('body-reserva'));
     renderFlatZone(document.getElementById('body-comprometidos'), 'comprometidos', 'Arraste dados da Reserva para engajar');
     renderFlatZone(document.getElementById('body-esgotados'), 'esgotados', 'Nenhum dado esgotado');
