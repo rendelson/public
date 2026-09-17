@@ -236,7 +236,7 @@
 
   <div class="foot">
     <button class="btn ghost" id="btn-reset">Reiniciar bandeja</button>
-    <p class="hint">Arraste um dado entre as áreas para movê-lo. Toque num dado parado em Comprometidos para rolar só ele, ou use "Rolar todos".</p>
+    <p class="hint">Arraste um dado entre as áreas para movê-lo. Toque num dado parado em Comprometidos para rolar (ou re-rolar um erro) só ele, ou use "Rolar todos" — cada rolagem consome uma fase de Estratégia, até o limite do seu stat.</p>
   </div>
 </div>
 
@@ -265,7 +265,7 @@
         dice.push({ id:color+'-'+i, color:color, zone:'reserva', rolled:null });
       }
     });
-    return { dice:dice, stats:{ vida:3, estrategia:2, recuperacao:2 } };
+    return { dice:dice, stats:{ vida:3, estrategia:2, recuperacao:2 }, estrategiaUsada:0 };
   }
 
   function loadFromStorage(){
@@ -273,7 +273,10 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       if(!raw) return null;
       var parsed = JSON.parse(raw);
-      if(parsed && Array.isArray(parsed.dice) && parsed.stats) return parsed;
+      if(parsed && Array.isArray(parsed.dice) && parsed.stats){
+        if(typeof parsed.estrategiaUsada !== 'number') parsed.estrategiaUsada = 0;
+        return parsed;
+      }
     }catch(e){}
     return null;
   }
@@ -308,20 +311,32 @@
     render();
   }
 
+  function strategyRemaining(){
+    return state.stats.estrategia - state.estrategiaUsada;
+  }
+
+  function isRerollable(die){
+    return die.rolled===null || die.rolled==='miss';
+  }
+
   function tryRollDie(id){
     var die = state.dice.filter(function(d){ return d.id===id; })[0];
-    if(!die || die.zone!=='comprometidos' || die.rolled!==null) return;
+    if(!die || die.zone!=='comprometidos' || !isRerollable(die)) return;
+    if(strategyRemaining()<=0) return;
     die.rolled = rollDie(die.color);
+    state.estrategiaUsada += 1;
     save();
     render();
   }
 
   function rolarTodos(){
-    var changed = false;
-    diceInZone('comprometidos').forEach(function(die){
-      if(die.rolled===null){ die.rolled = rollDie(die.color); changed = true; }
-    });
-    if(changed){ save(); render(); }
+    if(strategyRemaining()<=0) return;
+    var alvo = diceInZone('comprometidos').filter(isRerollable);
+    if(alvo.length===0) return;
+    alvo.forEach(function(die){ die.rolled = rollDie(die.color); });
+    state.estrategiaUsada += 1;
+    save();
+    render();
   }
 
   function encerrarEngajamento(){
@@ -534,14 +549,28 @@
   function renderButtons(){
     var comprometidos = diceInZone('comprometidos');
     var esgotados = diceInZone('esgotados');
-    document.getElementById('btn-rolar').disabled = comprometidos.filter(function(d){ return d.rolled===null; }).length===0;
+    var remaining = strategyRemaining();
+    var rollBtn = document.getElementById('btn-rolar');
+    var rollable = comprometidos.filter(isRerollable).length > 0;
+    rollBtn.disabled = !rollable || remaining<=0;
+    rollBtn.textContent = remaining>0
+      ? 'Rolar todos ('+remaining+' fase'+(remaining===1?'':'s')+' restante'+(remaining===1?'':'s')+')'
+      : 'Sem fases de estratégia restantes';
     document.getElementById('btn-encerrar').disabled = comprometidos.length===0;
     var recBtn = document.getElementById('btn-recuperar');
     recBtn.textContent = 'Recuperar ('+state.stats.recuperacao+')';
     recBtn.disabled = esgotados.length===0;
   }
 
+  function normalizeState(){
+    if(diceInZone('comprometidos').length===0 && state.estrategiaUsada!==0){
+      state.estrategiaUsada = 0;
+      save();
+    }
+  }
+
   function render(){
+    normalizeState();
     renderStats();
     renderReservaRows(document.getElementById('body-reserva'));
     renderFlatZone(document.getElementById('body-comprometidos'), 'comprometidos', 'Arraste dados da Reserva para engajar');
