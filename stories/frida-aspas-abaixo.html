@@ -8,14 +8,15 @@
   :root{--paper:#f8f7f3;--ink:#1d1b34;--muted:#8a8996;}
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{background:var(--paper)}
-  /* Story 1080x1920: shape em cima, texto embaixo alinhado à esquerda do shape (x=89). */
+  /* Story 1080x1920: shape em cima, texto embaixo alinhado à esquerda do shape;
+     o conjunto (shape + frase mais longa) fica centralizado na horizontal e na vertical. */
   .canvas{position:relative;width:1080px;height:1920px;background:var(--paper);overflow:hidden}
   .shape{position:absolute;left:0;top:0;width:1080px;height:1920px;
-    clip-path:polygon(335px 300px,592px 300px,430px 682px,617px 682px,617px 1168px,89px 1168px,89px 688px);
+    clip-path:polygon(478px 354px,735px 354px,573px 736px,760px 736px,760px 1222px,232px 1222px,232px 742px);
     background:#cfcfcf url(frida-foto.jpg) no-repeat;
-    background-size:763px auto;background-position:-139px 196px;
+    background-size:763px auto;background-position:4px 250px;
     filter:grayscale(1) contrast(1.05)}
-  .text{position:absolute;left:89px;top:1232px;width:902px;font-family:'Figtree',sans-serif}
+  .text{position:absolute;left:232px;top:1286px;width:902px;font-family:'Figtree',sans-serif}
   .quote{font-weight:300;font-size:68px;line-height:1.1;color:var(--ink);letter-spacing:-.025em}
   .quote strong{font-weight:700;letter-spacing:-.03em}
   .author{margin-top:34px;font-weight:600;font-size:22px;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
