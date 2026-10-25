@@ -18,10 +18,10 @@
     background:#cfcfcf url(frida-foto.jpg) no-repeat;
     background-size:763px auto;background-position:-139px 78px;
     filter:grayscale(1) contrast(1.05)}
-  .quote{position:absolute;left:701px;top:756px;width:350px;
-    font-family:'Outfit',sans-serif;font-weight:400;font-size:46px;line-height:1.62;color:var(--ink);letter-spacing:-.005em}
-  .author{position:absolute;left:703px;top:1088px;
-    font-family:'Outfit',sans-serif;font-weight:400;font-size:22px;letter-spacing:.04em;color:var(--muted)}
+  /* Texto ancorado na base do shape (y=1050): a assinatura assenta nessa linha. */
+  .text{position:absolute;left:672px;bottom:297px;width:380px;font-family:'Outfit',sans-serif}
+  .quote{font-weight:400;font-size:56px;line-height:1.18;color:var(--ink);letter-spacing:-.015em}
+  .author{margin-top:30px;font-weight:400;font-size:24px;line-height:1;letter-spacing:.04em;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -29,8 +29,10 @@
 <div class="canvas">
   <div class="block">
     <div class="shape"></div>
-    <p class="quote">Não quero que pense como eu, só quero que pense.</p>
-    <p class="author">— Frida Kahlo</p>
+    <div class="text">
+      <p class="quote">Não quero que pense como eu, só quero que pense.</p>
+      <p class="author">— Frida Kahlo</p>
+    </div>
   </div>
 </div>
 </body>
