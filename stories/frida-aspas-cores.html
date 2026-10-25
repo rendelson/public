@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Frida Casa Azul</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Paleta da Frida: azul da Casa Azul, amarelo-cempasúchil, rosa mexicano e creme. */
+  :root{--paper:#1f45a3;--ink:#fbf3e4;--accent:#f6b82e;--muted:#ff7eb0;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--paper)}
+  /* Story 1080x1920: shape em cima, texto embaixo alinhado à esquerda do shape;
+     a frase não passa da largura do shape (528px) e o conjunto fica centralizado na horizontal e na vertical. */
+  .canvas{position:relative;width:1080px;height:1920px;background:var(--paper);overflow:hidden}
+  .shape{position:absolute;left:0;top:0;width:1080px;height:1920px;
+    clip-path:polygon(522px 354px,779px 354px,617px 736px,804px 736px,804px 1222px,276px 1222px,276px 742px);
+    background:#cfcfcf url(frida-foto.jpg) no-repeat;
+    background-size:763px auto;background-position:48px 250px;
+    filter:grayscale(1) contrast(1.05)}
+  .text{position:absolute;left:276px;top:1286px;width:528px;font-family:'Figtree',sans-serif}
+  .quote{font-weight:300;font-size:64px;line-height:1.1;white-space:nowrap;color:var(--ink);letter-spacing:-.025em}
+  /* Primeira linha com entreletra levemente aberto, para encurtar a diferença de largura entre as linhas. */
+  .quote .l1{letter-spacing:-.005em}
+  .quote strong{font-weight:700;color:var(--accent);letter-spacing:-.03em}
+  .author{margin-top:34px;font-weight:600;font-size:22px;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="shape"></div>
+  <div class="text">
+    <p class="quote"><span class="l1">Não quero que</span><br>pense como eu, <strong>só<br>quero que pense.</strong></p>
+    <p class="author">Frida Kahlo</p>
+  </div>
+</div>
+</body>
+</html>
