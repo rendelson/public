@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Frida Aspas Post</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#f8f7f3;--ink:#1d1b34;--muted:#8a8996;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--paper)}
+  /* Layout base 1080x1350 (feed 4:5). ?story desloca o bloco para o centro de 1080x1920. */
+  .canvas{position:relative;width:1080px;height:1350px;background:var(--paper);overflow:hidden}
+  body.story .canvas{height:1920px}
+  .block{position:absolute;left:0;top:0;width:1080px;height:1350px}
+  body.story .block{top:285px}
+  .shape{position:absolute;inset:0;
+    clip-path:polygon(335px 182px,592px 182px,430px 564px,617px 564px,617px 1050px,89px 1050px,89px 570px);
+    background:#cfcfcf url(frida-foto.jpg) no-repeat;
+    background-size:763px auto;background-position:-139px 78px;
+    filter:grayscale(1) contrast(1.05)}
+  /* Texto ancorado na base do shape (y=1050): a assinatura assenta nessa linha. */
+  .text{position:absolute;left:672px;bottom:296px;width:400px;font-family:'Figtree',sans-serif}
+  /* Contraste de pesos como no specimen da Kind Sans (Light x Bold); Figtree é a alternativa livre mais próxima. */
+  .quote{font-weight:300;font-size:54px;line-height:1.12;color:var(--ink);letter-spacing:-.025em}
+  .quote strong{font-weight:700;letter-spacing:-.03em}
+  .author{margin-top:30px;font-weight:600;font-size:22px;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+</style>
+</head>
+<body>
+<script>if(location.search.includes('story'))document.body.className='story'</script>
+<div class="canvas">
+  <div class="block">
+    <div class="shape"></div>
+    <div class="text">
+      <p class="quote">Não quero que<br>pense como eu,<br><strong>só quero<br>que pense.</strong></p>
+      <p class="author">Frida Kahlo</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

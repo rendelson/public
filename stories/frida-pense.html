@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Frida Pense Story</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,800;1,400;1,500&family=Pinyon+Script&family=Montserrat:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#fff4e3;--gold:#f2b544;--pink:#ff6f91;--bg:#7a1035;--bg2:#3a0619;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1080px;height:1920px;overflow:hidden;background:var(--bg2)}
+  /* Foto: salve como frida-foto.jpg nesta pasta. Sem ela, fica o fundo vinho. */
+  .story{position:relative;width:1080px;height:1920px;color:var(--cream);
+    background:url(frida-foto.jpg) center 30%/cover no-repeat,
+               radial-gradient(ellipse at 50% 40%,var(--bg) 0%,var(--bg2) 80%)}
+  .shade{position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(20,3,10,.25) 0%,rgba(20,3,10,0) 30%,rgba(30,4,14,.55) 55%,rgba(30,4,14,.92) 100%)}
+  .text{position:absolute;left:96px;right:96px;bottom:330px;text-align:center}
+  .l1{font-family:'Playfair Display',serif;font-style:italic;font-weight:400;font-size:62px;line-height:1.15;letter-spacing:.005em}
+  .l2{font-family:'Montserrat',sans-serif;font-weight:500;font-size:30px;letter-spacing:.5em;text-transform:uppercase;
+    margin:48px 0 6px;display:flex;align-items:center;justify-content:center;gap:28px;color:var(--gold)}
+  .l2::before,.l2::after{content:"";height:2px;width:110px;background:var(--gold);opacity:.8}
+  .l3{font-family:'Playfair Display',serif;font-weight:800;font-size:250px;line-height:.95;letter-spacing:-.02em;
+    color:var(--cream);text-shadow:0 8px 40px rgba(0,0,0,.35)}
+  .l3 em{font-style:normal;color:var(--pink)}
+  .sig{font-family:'Pinyon Script',cursive;font-size:104px;color:var(--gold);margin-top:80px;line-height:1}
+</style>
+</head>
+<body>
+<div class="story">
+  <div class="shade"></div>
+  <div class="text">
+    <p class="l1">Não quero que pense<br>como eu,</p>
+    <p class="l2">só quero que</p>
+    <p class="l3">pense<em>.</em></p>
+    <p class="sig">Frida Kahlo</p>
+  </div>
+</div>
+</body>
+</html>
