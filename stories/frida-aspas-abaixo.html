@@ -18,6 +18,8 @@
     filter:grayscale(1) contrast(1.05)}
   .text{position:absolute;left:276px;top:1286px;width:528px;font-family:'Figtree',sans-serif}
   .quote{font-weight:300;font-size:64px;line-height:1.1;white-space:nowrap;color:var(--ink);letter-spacing:-.025em}
+  /* Primeira linha com entreletra levemente aberto, para encurtar a diferença de largura entre as linhas. */
+  .quote .l1{letter-spacing:-.005em}
   .quote strong{font-weight:700;letter-spacing:-.03em}
   .author{margin-top:34px;font-weight:600;font-size:22px;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 </style>
@@ -26,7 +28,7 @@
 <div class="canvas">
   <div class="shape"></div>
   <div class="text">
-    <p class="quote">Não quero que<br>pense como eu, <strong>só<br>quero que pense.</strong></p>
+    <p class="quote"><span class="l1">Não quero que</span><br>pense como eu, <strong>só<br>quero que pense.</strong></p>
     <p class="author">Frida Kahlo</p>
   </div>
 </div>
