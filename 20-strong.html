@@ -92,6 +92,18 @@
   .pipface .cell{ display:flex; align-items:center; justify-content:center; }
   .pip-dot{ width:3.5px; height:3.5px; border-radius:50%; background:currentColor; flex:none; }
 
+  .stat-card.ouro .stat-icon{ color:var(--c-yellow); }
+  .ouro-row{ display:flex; align-items:center; gap:8px; }
+  .ouro-btn{
+    width:29px; height:29px; border-radius:8px; padding:0;
+    border:1.5px solid var(--border); background:var(--surface-2);
+    color:var(--text); cursor:pointer; font-size:16px; font-weight:600; line-height:1;
+  }
+  .ouro-btn:hover:not(:disabled){ border-color:var(--c-yellow); }
+  .ouro-btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .ouro-val{ min-width:58px; text-align:center; font-size:17px; font-weight:600; color:var(--c-yellow); }
+  .ouro-val small{ font-size:11px; color:var(--muted-2); font-weight:500; }
+
   .legend-bar{
     display:flex; gap:16px; flex-wrap:wrap;
     font-size:12.5px; color:var(--muted);
@@ -271,6 +283,7 @@
     { key:'estrategia', label:'Estratégia', icon:'▭', min:1, max:6 },
     { key:'recuperacao', label:'Recuperação', icon:'➤', min:1, max:6 }
   ];
+  var OURO_MAX = 20;
 
   function defaultState(){
     var dice = [];
@@ -279,7 +292,7 @@
         dice.push({ id:color+'-'+i, color:color, zone:'reserva', rolled:null });
       }
     });
-    return { dice:dice, stats:{ vida:3, estrategia:2, recuperacao:2 }, estrategiaUsada:0 };
+    return { dice:dice, stats:{ vida:3, estrategia:2, recuperacao:2 }, estrategiaUsada:0, ouro:0 };
   }
 
   function loadFromStorage(){
@@ -289,6 +302,7 @@
       var parsed = JSON.parse(raw);
       if(parsed && Array.isArray(parsed.dice) && parsed.stats){
         if(typeof parsed.estrategiaUsada !== 'number') parsed.estrategiaUsada = 0;
+        if(typeof parsed.ouro !== 'number') parsed.ouro = 0;
         return parsed;
       }
     }catch(e){}
@@ -377,6 +391,12 @@
 
   function setStat(key, val){
     state.stats[key] = clampStat(key, val);
+    save();
+    render();
+  }
+
+  function setOuro(val){
+    state.ouro = Math.max(0, Math.min(OURO_MAX, val));
     save();
     render();
   }
@@ -538,6 +558,25 @@
       card.appendChild(row);
       wrap.appendChild(card);
     });
+    wrap.appendChild(renderOuro());
+  }
+
+  function renderOuro(){
+    var card = document.createElement('div');
+    card.className = 'stat-card ouro';
+    card.innerHTML =
+      '<div class="stat-head"><span class="stat-icon">●</span><span class="stat-label">Ouro</span></div>' +
+      '<div class="ouro-row">' +
+        '<button type="button" class="ouro-btn" aria-label="Remover 1 ouro" title="Remover 1 ouro">−</button>' +
+        '<span class="ouro-val mono" aria-live="polite">'+state.ouro+'<small>/'+OURO_MAX+'</small></span>' +
+        '<button type="button" class="ouro-btn" aria-label="Adicionar 1 ouro" title="Adicionar 1 ouro">+</button>' +
+      '</div>';
+    var btns = card.querySelectorAll('.ouro-btn');
+    btns[0].disabled = state.ouro<=0;
+    btns[1].disabled = state.ouro>=OURO_MAX;
+    btns[0].addEventListener('click', function(){ setOuro(state.ouro-1); });
+    btns[1].addEventListener('click', function(){ setOuro(state.ouro+1); });
+    return card;
   }
 
   function renderTally(){
